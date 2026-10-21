@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skyengine"
+version = "0.1.0"
+description = "Offline azimuth/altitude of the Sun, Moon and planets; MicroPython-compatible"
+requires-python = ">=3.6"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "astronomy-engine"]
+crosscheck = ["skyfield"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
