@@ -37,7 +37,11 @@ def day_number(utc):
 
 
 def obliquity(d):
-    """Obliquity of the ecliptic in degrees for day number d (may be fractional)."""
+    """Obliquity of the ecliptic in degrees for day number d (may be fractional).
+
+    Callers pass d + df as one float. That is deliberate: the rate is only
+    3.6e-7 deg/day, so single-precision rounding of d + df is negligible.
+    """
     return 23.4393 - 3.563e-7 * d
 
 

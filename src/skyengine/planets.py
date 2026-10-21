@@ -31,10 +31,10 @@ def mean_anomaly(planet, d, df):
     return rev(element(el[10], el[11], d, df))
 
 
-def heliocentric(planet, d, df, Mj, Ms, Mu):
+def heliocentric(planet, d, df, Mj, Msat, Mu):
     """Heliocentric ecliptic (lon, lat, r) of a planet, perturbations included.
 
-    Mj, Ms, Mu: mean anomalies of Jupiter, Saturn and Uranus (degrees),
+    Mj, Msat, Mu: mean anomalies of Jupiter, Saturn and Uranus (degrees),
     computed once per timestamp by the caller and shared between planets.
     r is in astronomical units.
     """
@@ -50,24 +50,24 @@ def heliocentric(planet, d, df, Mj, Ms, Mu):
     lon, lat, r = spherical(x, y, z)
 
     if planet == JUPITER:
-        lon += (-0.332 * sind(2 * Mj - 5 * Ms - 67.6)
-                - 0.056 * sind(2 * Mj - 2 * Ms + 21.0)
-                + 0.042 * sind(3 * Mj - 5 * Ms + 21.0)
-                - 0.036 * sind(Mj - 2 * Ms)
-                + 0.022 * cosd(Mj - Ms)
-                + 0.023 * sind(2 * Mj - 3 * Ms + 52.0)
-                - 0.016 * sind(Mj - 5 * Ms - 69.0))
+        lon += (-0.332 * sind(2 * Mj - 5 * Msat - 67.6)
+                - 0.056 * sind(2 * Mj - 2 * Msat + 21.0)
+                + 0.042 * sind(3 * Mj - 5 * Msat + 21.0)
+                - 0.036 * sind(Mj - 2 * Msat)
+                + 0.022 * cosd(Mj - Msat)
+                + 0.023 * sind(2 * Mj - 3 * Msat + 52.0)
+                - 0.016 * sind(Mj - 5 * Msat - 69.0))
     elif planet == SATURN:
-        lon += (0.812 * sind(2 * Mj - 5 * Ms - 67.6)
-                - 0.229 * cosd(2 * Mj - 4 * Ms - 2.0)
-                + 0.119 * sind(Mj - 2 * Ms - 3.0)
-                + 0.046 * sind(2 * Mj - 6 * Ms - 69.0)
-                + 0.014 * sind(Mj - 3 * Ms + 32.0))
-        lat += (-0.020 * cosd(2 * Mj - 4 * Ms - 2.0)
-                + 0.018 * sind(2 * Mj - 6 * Ms - 49.0))
+        lon += (0.812 * sind(2 * Mj - 5 * Msat - 67.6)
+                - 0.229 * cosd(2 * Mj - 4 * Msat - 2.0)
+                + 0.119 * sind(Mj - 2 * Msat - 3.0)
+                + 0.046 * sind(2 * Mj - 6 * Msat - 69.0)
+                + 0.014 * sind(Mj - 3 * Msat + 32.0))
+        lat += (-0.020 * cosd(2 * Mj - 4 * Msat - 2.0)
+                + 0.018 * sind(2 * Mj - 6 * Msat - 49.0))
     elif planet == URANUS:
-        lon += (0.040 * sind(Ms - 2 * Mu + 6.0)
-                + 0.035 * sind(Ms - 3 * Mu + 33.0)
+        lon += (0.040 * sind(Msat - 2 * Mu + 6.0)
+                + 0.035 * sind(Msat - 3 * Mu + 33.0)
                 - 0.015 * sind(Mj - Mu + 20.0))
 
     return rev(lon), lat, r

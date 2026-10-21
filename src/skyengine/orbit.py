@@ -3,12 +3,9 @@
 All angles are in degrees unless stated otherwise. Rectangular coordinate
 triples are plain tuples (x, y, z).
 """
-from math import sin, cos, atan2, sqrt, radians, degrees, pi
+from math import sin, cos, atan2, sqrt, radians, degrees
 
 from .timecalc import rev
-
-RAD2DEG = 180.0 / pi
-
 
 def sind(x):
     return sin(radians(x))
@@ -30,13 +27,16 @@ def element(a0, a1, d, df):
 
 def eccentric_anomaly(M, e):
     """Solve Kepler's equation for the eccentric anomaly E (degrees)."""
-    E = M + RAD2DEG * e * sind(M) * (1.0 + e * cosd(M))
+    e_deg = degrees(e)
+    M0 = M
+    M = rev(M + 180.0) - 180.0   # [-180, 180): keeps E small for float32
+    E = M + e_deg * sind(M) * (1.0 + e * cosd(M))
     for _ in range(10):
-        dE = (E - RAD2DEG * e * sind(E) - M) / (1.0 - e * cosd(E))
+        dE = (E - e_deg * sind(E) - M) / (1.0 - e * cosd(E))
         E -= dE
-        if abs(dE) < 1e-4:
+        if abs(dE) < 1e-3:
             break
-    return E
+    return E + (M0 - M)   # restore the caller's 360-degree turn
 
 
 def orbit_plane_position(a, e, M):
@@ -85,11 +85,6 @@ def ecliptic_to_equatorial(x, y, z, ecl):
     return x, y * ce - z * se, y * se + z * ce
 
 
-def radec(x, y, z):
-    """Right ascension and declination in degrees from an equatorial vector."""
-    return rev(degrees(atan2(y, x))), degrees(atan2(z, sqrt(x * x + y * y)))
-
-
 def horizontal(x, y, z, lst, lat):
     """Shared transform: equatorial rectangular vector -> (azimuth, altitude).
 
@@ -111,9 +106,3 @@ def horizontal(x, y, z, lst, lat):
     az = rev(degrees(atan2(yh, xhor)) + 180.0)
     alt = degrees(atan2(zhor, sqrt(xhor * xhor + yh * yh)))
     return az, alt
-
-
-def radec_to_horizontal(ra, dec, lst, lat):
-    """Convenience wrapper: (RA, Dec) in degrees -> (azimuth, altitude)."""
-    x, y, z = rect(ra, dec, 1.0)
-    return horizontal(x, y, z, lst, lat)

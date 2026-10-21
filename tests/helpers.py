@@ -70,3 +70,15 @@ def wrap180(x):
 
 
 BODIES = list(range(len(skyengine.NAMES)))
+
+
+def radec(x, y, z):
+    """Right ascension and declination in degrees from an equatorial vector."""
+    return (timecalc.rev(math.degrees(math.atan2(y, x))),
+            math.degrees(math.atan2(z, math.sqrt(x * x + y * y))))
+
+
+def radec_to_horizontal(ra, dec, lst, lat):
+    """(RA, Dec) in degrees -> (azimuth, altitude)."""
+    x, y, z = orbit.rect(ra, dec, 1.0)
+    return orbit.horizontal(x, y, z, lst, lat)

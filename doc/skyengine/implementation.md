@@ -49,8 +49,10 @@ implemented directly:
 
 1. Day number `d` (integer, 0 at 1999-12-31 00:00 UT) and time of day `ut` in hours.
 2. Linear orbital elements `a0 + a1 * d`, mean anomaly reduced to `[0, 360)`.
-3. Kepler's equation: first approximation followed by Newton iteration until
-   the step is below 0.0001 degrees (at most 10 iterations).
+3. Kepler's equation: the mean anomaly is first reduced to `[-180, 180)` (keeps
+   `E` small in single precision), then a first approximation is followed by
+   Newton iteration until the step is below 0.001 degrees (at most 10
+   iterations). The result is shifted back to the caller's 360-degree turn.
 4. Orbit-plane position, rotation by `w`, `i`, `N` into ecliptic rectangular
    coordinates.
 5. Sun: geocentric directly. Planets: heliocentric spherical coordinates,
@@ -156,6 +158,7 @@ pytest                            # about 1 second
 
 | File                              | Covers                                                                                                                                                            |
 |-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `tests/helpers.py`                | shared tolerances and error summary; test-only `radec()` and `radec_to_horizontal()` helpers                                                                         |
 | `tests/test_time.py`              | day number against `datetime` for every day 2019-2051, leap years, rollover, `rev()`, GMST against Astronomy Engine, sidereal progression, longitude sign         |
 | `tests/test_coords.py`            | horizontal transform conventions (zenith, meridian, east/west, poles, below horizon), azimuth normalisation, API shape, hemisphere and midnight-sun behaviour     |
 | `tests/test_schlyter_examples.py` | intermediate values from Schlyter's 1990-04-19 worked example for the Sun, Moon, all planet elements and heliocentric positions                                   |

@@ -7,6 +7,7 @@ import pytest
 
 import skyengine
 from skyengine import timecalc, orbit, sun, moon, planets
+import helpers
 
 D = -3543
 DF = 0.0
@@ -31,7 +32,7 @@ def test_sun_equatorial_and_horizontal():
     assert (x, y) == pytest.approx((0.881048, 0.482098), abs=2e-6)
     xe, ye, ze = orbit.ecliptic_to_equatorial(x, y, 0.0, ecl)
     assert (xe, ye, ze) == pytest.approx((0.881048, 0.442312, 0.191778), abs=2e-6)
-    ra, dec = orbit.radec(xe, ye, ze)
+    ra, dec = helpers.radec(xe, ye, ze)
     assert ra == pytest.approx(26.6580, abs=2e-4)
     assert dec == pytest.approx(11.0084, abs=2e-4)
 
@@ -71,7 +72,7 @@ def test_moon_geocentric_with_perturbations():
     ecl = timecalc.obliquity(D)
     x, y, z = orbit.rect(lon, lat, 1.0)
     xe, ye, ze = orbit.ecliptic_to_equatorial(x, y, z, ecl)
-    ra, dec = orbit.radec(xe, ye, ze)
+    ra, dec = helpers.radec(xe, ye, ze)
     assert ra == pytest.approx(309.5011, abs=3e-4)
     assert dec == pytest.approx(-19.1032, abs=3e-4)
 
@@ -91,7 +92,7 @@ def test_moon_topocentric():
     x, y, z = orbit.rect(lon, lat, r)
     xe, ye, ze = orbit.ecliptic_to_equatorial(x, y, z, ecl)
     ox, oy, oz = moon.observer_vector(LAT, lst)
-    ra, dec = orbit.radec(xe - ox, ye - oy, ze - oz)
+    ra, dec = helpers.radec(xe - ox, ye - oy, ze - oz)
     assert ra == pytest.approx(310.0017, abs=1e-2)
     assert dec == pytest.approx(-19.8790, abs=1e-2)
 
@@ -161,6 +162,6 @@ def test_mercury_geocentric():
     assert (xg, yg, zg) == pytest.approx((0.513227, 0.543182, 0.038699), abs=3e-6)
     xe, ye, ze = orbit.ecliptic_to_equatorial(xg, yg, zg, timecalc.obliquity(D))
     assert (xe, ye, ze) == pytest.approx((0.513227, 0.482961, 0.251582), abs=3e-6)
-    ra, dec = orbit.radec(xe, ye, ze)
+    ra, dec = helpers.radec(xe, ye, ze)
     assert ra == pytest.approx(43.2598, abs=3e-4)
     assert dec == pytest.approx(19.6460, abs=3e-4)

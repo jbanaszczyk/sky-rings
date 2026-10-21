@@ -10,30 +10,30 @@ LST = 123.4  # arbitrary local sidereal time (degrees)
 
 
 def test_object_on_meridian_at_zenith():
-    az, alt = orbit.radec_to_horizontal(LST, 50.0, LST, 50.0)
+    az, alt = helpers.radec_to_horizontal(LST, 50.0, LST, 50.0)
     assert alt == pytest.approx(90.0, abs=1e-9)
 
 
 def test_transit_south_of_zenith():
-    az, alt = orbit.radec_to_horizontal(LST, 20.0, LST, 50.0)
+    az, alt = helpers.radec_to_horizontal(LST, 20.0, LST, 50.0)
     assert az == pytest.approx(180.0)
     assert alt == pytest.approx(60.0)
 
 
 def test_transit_north_of_zenith_northern_observer():
-    az, alt = orbit.radec_to_horizontal(LST, 80.0, LST, 50.0)
+    az, alt = helpers.radec_to_horizontal(LST, 80.0, LST, 50.0)
     assert az == pytest.approx(0.0) or az == pytest.approx(360.0)
     assert alt == pytest.approx(60.0)
 
 
 def test_transit_north_of_zenith_southern_observer():
-    az, alt = orbit.radec_to_horizontal(LST, -10.0, LST, -40.0)
+    az, alt = helpers.radec_to_horizontal(LST, -10.0, LST, -40.0)
     assert az == pytest.approx(0.0) or az == pytest.approx(360.0)
     assert alt == pytest.approx(60.0)
 
 
 def test_south_transit_southern_observer():
-    az, alt = orbit.radec_to_horizontal(LST, -70.0, LST, -40.0)
+    az, alt = helpers.radec_to_horizontal(LST, -70.0, LST, -40.0)
     assert az == pytest.approx(180.0)
     assert alt == pytest.approx(60.0)
 
@@ -41,22 +41,22 @@ def test_south_transit_southern_observer():
 @pytest.mark.parametrize("lat", [-60.0, -10.0, 0.0, 35.0, 70.0])
 def test_equatorial_object_rising_east_setting_west(lat):
     # hour angle -90: rising point of the celestial equator, due east
-    az, alt = orbit.radec_to_horizontal(LST + 90.0, 0.0, LST, lat)
+    az, alt = helpers.radec_to_horizontal(LST + 90.0, 0.0, LST, lat)
     assert az == pytest.approx(90.0)
     assert alt == pytest.approx(0.0, abs=1e-9)
     # hour angle +90: due west
-    az, alt = orbit.radec_to_horizontal(LST - 90.0, 0.0, LST, lat)
+    az, alt = helpers.radec_to_horizontal(LST - 90.0, 0.0, LST, lat)
     assert az == pytest.approx(270.0)
     assert alt == pytest.approx(0.0, abs=1e-9)
 
 
 def test_celestial_pole():
-    az, alt = orbit.radec_to_horizontal(0.0, 90.0, LST, 50.0)
+    az, alt = helpers.radec_to_horizontal(0.0, 90.0, LST, 50.0)
     assert alt == pytest.approx(50.0)
     assert az == pytest.approx(0.0, abs=1e-6) or az == pytest.approx(360.0, abs=1e-6)
-    az, alt = orbit.radec_to_horizontal(0.0, 90.0, LST, 0.0)   # pole on the horizon at the equator
+    az, alt = helpers.radec_to_horizontal(0.0, 90.0, LST, 0.0)   # pole on the horizon at the equator
     assert alt == pytest.approx(0.0, abs=1e-9)
-    az, alt = orbit.radec_to_horizontal(0.0, -90.0, LST, -30.0)
+    az, alt = helpers.radec_to_horizontal(0.0, -90.0, LST, -30.0)
     assert alt == pytest.approx(30.0)
     assert az == pytest.approx(180.0)
 
@@ -64,14 +64,14 @@ def test_celestial_pole():
 def test_north_pole_observer_altitude_equals_declination():
     for ra in (0.0, 90.0, 200.0, 359.0):
         for dec in (-45.0, 0.0, 33.0):
-            _, alt = orbit.radec_to_horizontal(ra, dec, LST, 90.0)
+            _, alt = helpers.radec_to_horizontal(ra, dec, LST, 90.0)
             assert alt == pytest.approx(dec)
 
 
 def test_below_horizon():
-    az, alt = orbit.radec_to_horizontal(LST, -60.0, LST, 50.0)
+    az, alt = helpers.radec_to_horizontal(LST, -60.0, LST, 50.0)
     assert alt == pytest.approx(-20.0)
-    az, alt = orbit.radec_to_horizontal(LST + 180.0, 0.0, LST, 50.0)  # lower culmination
+    az, alt = helpers.radec_to_horizontal(LST + 180.0, 0.0, LST, 50.0)  # lower culmination
     assert alt == pytest.approx(-40.0)
     assert az == pytest.approx(0.0) or az == pytest.approx(360.0)
 
@@ -80,15 +80,15 @@ def test_azimuth_normalised_over_full_sweep():
     for ha10 in range(-1800, 1800):
         ha = ha10 / 10.0
         for dec in (-80.0, -20.0, 0.0, 55.0, 89.0):
-            az, alt = orbit.radec_to_horizontal(LST - ha, dec, LST, 50.0)
+            az, alt = helpers.radec_to_horizontal(LST - ha, dec, LST, 50.0)
             assert 0.0 <= az < 360.0
             assert -90.0 <= alt <= 90.0
 
 
 def test_azimuth_wrap_around_north():
     # object just east / just west of the meridian, north of the zenith
-    az_e, _ = orbit.radec_to_horizontal(LST + 0.5, 80.0, LST, 50.0)
-    az_w, _ = orbit.radec_to_horizontal(LST - 0.5, 80.0, LST, 50.0)
+    az_e, _ = helpers.radec_to_horizontal(LST + 0.5, 80.0, LST, 50.0)
+    az_w, _ = helpers.radec_to_horizontal(LST - 0.5, 80.0, LST, 50.0)
     assert az_e < 90.0           # a few degrees east of north
     assert az_w > 270.0          # a few degrees west of north
     assert abs(helpers.wrap180(az_e - az_w)) < 10.0
@@ -104,7 +104,7 @@ def test_radec_roundtrip():
     for ra in (0.0, 45.0, 179.9, 180.1, 300.0):
         for dec in (-89.0, -20.0, 0.0, 66.0):
             x, y, z = orbit.rect(ra, dec, 1.0)
-            r, d = orbit.radec(x, y, z)
+            r, d = helpers.radec(x, y, z)
             assert r == pytest.approx(ra, abs=1e-9)
             assert d == pytest.approx(dec, abs=1e-9)
 
